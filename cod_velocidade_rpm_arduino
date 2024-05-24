@@ -1,0 +1,91 @@
+#include <Encoder.h>
+#include <Arduino.h>
+
+// Definições de pinos para o motor e encoder
+const int CHA = 2;   // Pino A do encoder
+const int CHB = 12;  // Pino B do encoder
+const int IN1 = 9;   // Pino IN1 da ponte H (controle de direção)
+const int IN2 = 8;   // Pino IN2 da ponte H (controle de direção)
+const int ENA = 10;  // Pino ENA da ponte H (controle de velocidade)
+const int MAX_PWM_VALUE = 255; // Valor máximo de PWM (0 a 255)
+const int PWM_INCREMENT = 5;   // Incremento de PWM
+
+// Constantes para configuração do encoder
+const float PPR = 200.0; // Pulsos por rotação do encoder
+
+// Variáveis para controle de posição e velocidade
+volatile long encoderCount = 0; // Contador de pulsos do encoder
+volatile unsigned long lastTime = 0; // Último tempo registrado para cálculo de velocidade
+double speed = 0.0; // Velocidade calculada do encoder em unidades de posição por segundo
+int currentPWM = 0; // Valor atual de PWM para controle de velocidade
+
+// Objeto Encoder
+Encoder encoder(CHA, CHB);
+
+void countPulses() {
+  // Incrementa a contagem de pulsos do encoder, sempre positivo
+  if (digitalRead(CHA) == digitalRead(CHB)) {
+    encoderCount++;
+  } else {
+    encoderCount--;
+  }
+}
+
+void calculateCurrentSpeed() {
+  // Calcula o tempo decorrido desde a última atualização
+  unsigned long currentTime = micros();
+  unsigned long timeChange = currentTime - lastTime;
+  lastTime = currentTime;
+
+  // Calcula a mudança na posição do encoder desde a última atualização
+  long currentPosition = encoder.read();
+  long positionChange = abs(encoderCount);
+  encoderCount = 0;
+
+  // Calcula a velocidade em unidades de posição por segundo
+  if (timeChange > 0) {
+    speed = (positionChange * 1000000.0) / timeChange; // Velocidade em posições por segundo
+  }
+
+  // Converte a velocidade para RPM
+  float rpm = (speed / PPR) * 60.0;  // RPM = (velocidade / PPR) * 60
+
+  // Exibe a velocidade calculada em RPM no Serial Monitor
+  Serial.print("Velocidade: ");
+  Serial.print(rpm);
+  Serial.println(" RPM");
+}
+
+void setup() {
+  // Configura os pinos como saída ou entrada conforme necessário
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(ENA, OUTPUT);
+  pinMode(CHA, INPUT);
+  pinMode(CHB, INPUT);
+
+  // Inicializa a comunicação serial
+  Serial.begin(9600);
+
+  // Configura interrupção para contar os pulsos do encoder
+  attachInterrupt(digitalPinToInterrupt(CHA), countPulses, RISING);
+
+  // Define a direção do motor (sentido horário)
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+}
+
+void loop() {
+  // Aumenta gradativamente a velocidade do motor até o valor máximo desejado
+  if (currentPWM < MAX_PWM_VALUE) {
+    currentPWM += PWM_INCREMENT;
+    if (currentPWM > MAX_PWM_VALUE) {
+      currentPWM = MAX_PWM_VALUE;
+    }
+    analogWrite(ENA, currentPWM); // Atualiza a velocidade do motor
+  }
+
+  calculateCurrentSpeed(); // Calcula e exibe a velocidade do motor em RPM
+
+  delay(1000); // Espera 1 segundo entre leituras
+}
