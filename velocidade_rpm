@@ -1,0 +1,75 @@
+import serial
+import pandas as pd
+import time
+import os
+
+# Configurações da porta serial
+serial_port = 'COM5'  # Substitua pelo nome da porta correta
+baud_rate = 9600
+
+# Cria uma conexão serial
+ser = serial.Serial(serial_port, baud_rate)
+
+# Lista para armazenar os dados de tempo e RPM
+data = []
+readings_count = 0  # Contador de leituras bem-sucedidas
+
+try:
+    # Marca o tempo inicial
+    start_time = time.time()
+
+    # Leitura de 500 valores para teste
+    while readings_count < 420:
+        if ser.in_waiting > 0:
+            # Lê uma linha da porta serial
+            line = ser.readline().decode('utf-8').strip()
+            print(f"Linha lida da porta serial: '{line}'")  # Log da linha lida
+            try:
+                # Extrai apenas o valor numérico da linha
+                rpm_str = line.split(':')[1].split()[0]
+                # Converte o valor lido para float
+                rpm = float(rpm_str)
+                
+                # Calcula o tempo em segundos desde o início
+                elapsed_time = time.time() - start_time
+                # Armazena o tempo e o RPM na lista
+                data.append((elapsed_time, rpm))
+                readings_count += 1
+                print(f"Lido RPM: {rpm} no tempo: {elapsed_time:.2f}s (Valor {readings_count}/420)")
+            except (ValueError, IndexError) as e:
+                print(f"Erro na conversão: {line} -> {e}")
+        
+        # Espera um segundo entre leituras
+        time.sleep(1)
+except KeyboardInterrupt:
+    print("Leitura interrompida pelo usuário.")
+finally:
+    # Fecha a conexão serial
+    ser.close()
+
+    # Verifica se 500 valores foram armazenados
+    if readings_count == 420:
+        # Cria um DataFrame com os dados de tempo e RPM
+        df = pd.DataFrame(data, columns=['Tempo (s)', 'RPM'])
+
+        # Define o caminho do arquivo
+        file_path = r'C:\Users\cin_t\Python\velocidade_fenix.csv'
+
+        # Verifica se o diretório existe e cria se não existir
+        if not os.path.exists(os.path.dirname(file_path)):
+            try:
+                os.makedirs(os.path.dirname(file_path))
+            except OSError as e:
+                print(f"Erro ao criar o diretório: {e}")
+        else:
+            # Salva os dados em um arquivo CSV
+            try:
+                df.to_csv(file_path, index=False)
+                print(f"Dados salvos em {file_path}")
+            except Exception as e:
+                print(f"Erro ao salvar o arquivo CSV: {e}")
+    else:
+        print(f"Erro: Apenas {readings_count} valores foram armazenados.")
+
+# Imprimir o diretório de trabalho atual
+print(f"Diretório de trabalho atual: {os.getcwd()}")
