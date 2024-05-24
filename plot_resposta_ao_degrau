@@ -1,0 +1,26 @@
+
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Define o caminho do arquivo CSV
+file_path = r'C:\Users\cin_t\Python\velocidade_fenix.csv'
+
+# Lê os dados do arquivo CSV em um DataFrame
+df = pd.read_csv(file_path)
+
+# Configura o estilo do seaborn para melhorar a visualização
+sns.set(style="whitegrid")
+
+# Plota os dados com melhorias na visualização
+plt.figure(figsize=(12, 6))
+plt.plot(df['Tempo (s)'], df['RPM'], marker='o', linestyle='-', color='b', label='RPM')
+plt.title('RPM ao longo do Tempo', fontsize=14)
+plt.xlabel('Tempo (s)', fontsize=12)
+plt.ylabel('RPM', fontsize=12)
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
+plt.legend(fontsize=12)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
