@@ -1,3 +1,4 @@
+#cod sem a razão ciclica
 #include <Encoder.h>
 #include <Arduino.h>
 
