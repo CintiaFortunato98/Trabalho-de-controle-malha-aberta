@@ -1,0 +1,694 @@
+#:kivy 1.11.1
+<EletricasPopup>:
+    title: "Medidas Elétricas - Ventilação"
+    size_hint_y: None
+    size_hint_x: 0.4
+    height: 600
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            id: buttons_inputs
+            size_hint: 1,0.3
+            ToggleButton:
+                id: bt_tensao
+                text: 'Tensão'
+                group: 'geometry'
+                on_press: root.toggle_change('t')
+            ToggleButton:
+                id: bt_corrente
+                text: 'Corrente'
+                group: 'geometry'
+                on_press: root.toggle_change('c')
+            ToggleButton:
+                id: bt_demanda
+                text: 'Demanda'
+                group: 'geometry'
+                on_press: root.toggle_change('d')
+            ToggleButton:
+                id: bt_fp
+                text: 'Fator de Potência'
+                group: 'geometry'
+                on_press: root.toggle_change('fp')
+            ToggleButton:
+                id: bt_thd
+                text: 'TDH - Harmônica'
+                group: 'geometry'
+                on_press: root.toggle_change('thd')
+        GridLayout:
+            cols: 2
+            rows: 6
+            Label:
+                id: medida_titulo_a
+                text: ''
+            Label:
+                id: medida_valor_a
+                text: ''
+            Label:
+                id: medida_titulo_b
+                text: ''
+            Label:
+                id: medida_valor_b
+                text: ''
+            Label:
+                id: medida_titulo_c
+                text: ''
+            Label:
+                id: medida_valor_c
+                text: ''
+            Label:
+                id: medida_titulo_d
+                text: ''
+            Label:
+                id: medida_valor_d
+                text: ''
+            Label:
+                id: medida_titulo_e
+                text: ''
+            Label:
+                id: medida_valor_e
+                text: ''
+            Label:
+                id: medida_titulo_f
+                text: ''
+            Label:
+                id: medida_valor_f
+                text: ''
+
+<ModbusPopup>:
+    title: 'Configuração Modbus'
+    size_hint_y: None
+    size_hint_x: 0.4
+    height: 200
+    BoxLayout:
+        orientation:'vertical'
+        id: layout
+        GridLayout:
+            cols: 2
+            rows: 2
+            Label:
+                id: ip
+                text: 'IP'
+                font_size: 14
+            TextInput:
+                id: txt_ip
+                text: 'localhost'
+                halign:'center'
+                valign: 'middle'
+            Label:
+                id: porta
+                text: 'Porta'
+                font_size: 14
+            TextInput:
+                id: txt_port
+                text: '502'
+                halign:'center'
+                valign: 'middle'
+        BoxLayout:
+            orientation:'horizontal'
+            Button:
+                text: 'Conectar'
+                size_hint_y: None
+                height: 40
+                on_release: 
+                    app.root.startDataRead(str(txt_ip.text), int(txt_port.text))
+            Button:
+                text: 'Fechar'
+                size_hint_y: None
+                height: 40
+                on_release: root.dismiss()
+<ScanPopup>:
+    title: 'Configuração Scan Time'
+    size_hint_y: None
+    size_hint_x: 0.4
+    height: 200
+    BoxLayout:
+        orientation:'vertical'
+        id: layout
+        GridLayout:
+            cols: 2
+            rows: 2
+            Label:
+                id: scan_time
+                text: 'Scan Time [ms]'
+                font_size: 14
+            TextInput:
+                id: txt_st
+                halign:'center'
+                valign: 'middle'
+
+        BoxLayout:
+            orientation:'horizontal'
+            Button:
+                text: 'Configurar'
+                size_hint_y: None
+                height: 40
+                on_release: 
+                    app.root._scan_time = int(txt_st.text)
+            Button:
+                text: 'Fechar'
+                size_hint_y: None
+                height: 40
+                on_release: root.dismiss()
+<softPopup>:
+    size_hint: 0.6, 0.6
+    title: 'SOFT STARTER'
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, 0.8
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        spacing: 30
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.15
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 10
+                Label:
+                    text: 'ON'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                Label:
+                    text: 'OFF'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                Label:
+                    text: 'RESET'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 10
+                CheckBox:
+                    id: soft_checkbox_on
+                    group: 'status'
+                    active: False
+                    on_active: if soft_checkbox_on.active: root.acoes.acionaMotor("sel_partida_soft", "on")
+                CheckBox:
+                    id: soft_checkbox_off
+                    group: 'status'
+                    active: False
+                    on_active: if soft_checkbox_off.active: root.acoes.acionaMotor("sel_partida_soft", "off")
+                CheckBox:
+                    id: soft_checkbox_reset
+                    group: 'status'
+                    active: False
+                    on_active: if soft_checkbox_reset.active: root.acoes.acionaMotor("sel_partida_soft", "reset")
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.65
+            spacing: 30  
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.3
+                spacing: 5  
+                padding: [10, 10, 10, 10] 
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.1  # Cor de fundo suave para separação visual
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'RAMPA DE ACELERAÇÃO'
+                    halign: 'center'
+                    valign: 'middle'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 2  
+                    Slider:
+                        size_hint: 0.9, 1
+                        id: soft_aceleracao
+                        min: 10
+                        max: 60
+                        value: 10
+                        step: 1
+                        on_value: root.acoes.mudaAceleracao("sel_aceleracao_soft", soft_aceleracao.value)
+                    Label:
+                        size_hint: 0.1, 1
+                        text: str(int(soft_aceleracao.value)) + 's'
+                        halign: 'center'
+                        valign: 'middle'
+                        font_size: '18sp'
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.3
+                spacing: 5  
+                padding: [10, 10, 10, 10]  
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.1 
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'RAMPA DE DESACELERAÇÃO'
+                    halign: 'center'
+                    valign: 'middle'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 2
+                    Slider:
+                        size_hint: 0.9, 1
+                        id: soft_desaceleracao
+                        min: 10
+                        max: 60
+                        value: 10
+                        step: 1
+                        on_value: root.acoes.mudaDesaceleracao("sel_desaceleracao_soft", soft_desaceleracao.value)
+                    Label:
+                        size_hint: 0.1, 1
+                        text: str(int(soft_desaceleracao.value)) + 's'
+                        halign: 'center'
+                        valign: 'middle'
+                        font_size: '18sp'
+
+<inversorPopup>:
+    size_hint: 0.6, 0.6
+    title: 'INVERSOR DE FREQUÊNCIA'
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 30
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.2
+            padding: [0, 30, 0, 0] 
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 10
+                Label:
+                    text: 'ON'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                Label:
+                    text: 'OFF'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                Label:
+                    text: 'RESET'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+            BoxLayout:
+                orientation: 'horizontal'
+                spacing: 10
+                CheckBox:
+                    id: inversor_checkbox_on
+                    group: 'status'
+                    active: False
+                    on_active: if inversor_checkbox_on.active: root.acoes.acionaMotor("sel_partida_inversor", "on")
+                CheckBox:
+                    id: inversor_checkbox_off
+                    group: 'status'
+                    active: False
+                    on_active: if inversor_checkbox_off.active: root.acoes.acionaMotor("sel_partida_inversor", "off")
+                CheckBox:
+                    id: inversor_checkbox_reset
+                    group: 'status'
+                    active: False
+                    on_active: if inversor_checkbox_reset.active: root.acoes.acionaMotor("sel_partida_inversor", "reset")
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.8
+            spacing: 30  
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.3
+                spacing: 5  
+                padding: [10, 10, 10, 10]  
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.1 
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'VELOCIDADE'
+                    halign: 'center'
+                    valign: 'middle'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 2  
+                    Slider:
+                        size_hint: 0.9, 1
+                        id: inversor_velocidade
+                        min: 10
+                        max: 60
+                        value: 10
+                        step: 1
+                        on_value: root.acoes.mudaVelocidade("sel_velocidade_inversor", (inversor_velocidade.value)*10)
+                    Label:
+                        size_hint: 0.1, 1
+                        text: str(int(inversor_velocidade.value)) + 'Hz'
+                        halign: 'center'
+                        valign: 'middle'
+                        font_size: '18sp'
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.3
+                spacing: 5  
+                padding: [10, 10, 10, 10] 
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.1  # Cor de fundo suave para separação visual
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'RAMPA DE ACELERAÇÃO'
+                    halign: 'center'
+                    valign: 'middle'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 2  
+                    Slider:
+                        size_hint: 0.9, 1
+                        id: inversor_aceleracao
+                        min: 10
+                        max: 60
+                        value: 10
+                        step: 1
+                        on_value: root.acoes.mudaAceleracao("sel_aceleracao_inversor", (inversor_aceleracao.value)*10)
+                    Label:
+                        size_hint: 0.1, 1
+                        text: str(int(inversor_aceleracao.value)) + 's'
+                        halign: 'center'
+                        valign: 'middle'
+                        font_size: '18sp'
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, 0.3
+                spacing: 5  
+                padding: [10, 10, 10, 10]  
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.1 
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Label:
+                    text: 'RAMPA DE DESACELERAÇÃO'
+                    halign: 'center'
+                    valign: 'middle'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 2
+                    Slider:
+                        size_hint: 0.9, 1
+                        id: inversor_desaceleracao
+                        min: 10
+                        max: 60
+                        value: 10
+                        step: 1
+                        on_value: root.acoes.mudaDesaceleracao("sel_desaceleracao_inversor", (inversor_desaceleracao.value)*10)
+                    Label:
+                        size_hint: 0.1, 1
+                        text: str(int(inversor_desaceleracao.value)) + 's'
+                        halign: 'center'
+                        valign: 'middle'
+                        font_size: '18sp'
+
+<diretaPopup>:
+    title: 'PARTIDA DIRETA'
+    size_hint: 0.6, 0.3
+    BoxLayout:
+        orientation: 'vertical'
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint: 1, 0.4
+        BoxLayout:
+            size_hint: 1, 0.1
+            orientation: 'horizontal'
+            padding: [10, 0, 10, 0]  # Ajusta o padding para aproximar os rótulos dos botões
+            spacing: 10  # Ajusta o espaçamento entre os elementos
+            Label:
+                text: 'ON'
+                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+            Label:
+                text: 'OFF'
+                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+            Label:
+                text: 'RESET'
+                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+        BoxLayout:
+            size_hint: 1, 0.3
+            orientation: 'horizontal'
+            padding: [10, 0, 10, 0]  # Ajusta o padding para aproximar os botões dos rótulos
+            spacing: 10  # Ajusta o espaçamento entre os elementos
+            CheckBox:
+                id: direta_checkbox_on
+                group: 'status'
+                active: False
+                on_active: if direta_checkbox_on.active: root.acoes.acionaMotor("sel_partida_direta", "on")
+            CheckBox:
+                id: direta_checkbox_off
+                group: 'status'
+                active: False
+                on_active: if direta_checkbox_off.active: root.acoes.acionaMotor("sel_partida_direta", "off")
+            CheckBox:
+                id: direta_checkbox_reset
+                group: 'status'
+                active: False
+                on_active: if direta_checkbox_reset.active: root.acoes.acionaMotor("sel_partida_direta", "reset")
+
+<CompressorPopup>:
+    title: 'Configuração Compressor e Aquecedor'
+    size_hint: 0.8, 0.8  # Reduzindo o tamanho do popup
+    BoxLayout:
+        orientation: 'vertical'
+        id: layout
+        canvas.before:
+            Color:
+                rgba: 0.1, 0.1, 0.1, 1  # Fundo cinza escuro
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: (1, 0.4)
+            spacing: 20
+
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 10
+                padding: 10
+                canvas.before:
+                    Color:
+                        rgba: 0.2, 0.2, 0.2, 1  # Fundo cinza para a caixa
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                Label:
+                    text: 'Aquecedores'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                    font_size: '20sp'
+                    size_hint_y: None
+                    height: 40
+
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 20  # Espaçamento entre Aquecedor 1 e Aquecedor 2
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: 10  # Espaçamento entre os elementos do Aquecedor 1
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: 10
+
+                            Label:
+                                text: 'On'
+                                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                            CheckBox:
+                                id: st_aquecedor_1_on
+                                group: 'aquecedor_1'
+                                on_active: root.checkbox_activated('aquecedor_1', self.active)
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: 10
+
+                            Label:
+                                text: 'Off'
+                                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                            CheckBox:
+                                id: st_aquecedor_1_off
+                                group: 'aquecedor_1'
+
+                    BoxLayout:
+                        orientation: 'vertical'
+                        spacing: 10   #Espaçamento entre os elementos do Aquecedor 2
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: 10
+
+                            Label:
+                                text: 'On'
+                                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                            CheckBox:
+                                id: st_aquecedor_2_on
+                                group: 'aquecedor_2'
+                                on_active: root.checkbox_activated('aquecedor_2', self.active)
+
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            spacing: 10
+
+                            Label:
+                                text: 'Off'
+                                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                            CheckBox:
+                                id: st_aquecedor_2_off
+                                group: 'aquecedor_2'
+
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 10
+                padding: 10
+                canvas.before:
+                    Color:
+                        rgba: 0.2, 0.2, 0.2, 1  # Fundo cinza para a caixa
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+                Label:
+                    text: 'Compressor'
+                    color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                    font_size: '20sp'
+                    size_hint_y: None
+                    height: 40
+
+                BoxLayout:
+                    orientation: 'horizontal'
+                    ToggleButton:
+                        id: hermetico
+                        text: 'Hermético'
+                        group: 'compressor_button'
+                        on_press: root.seleciona_compressor('hermetico')
+
+                    ToggleButton:
+                        id: scroll
+                        text: 'Scroll'
+                        group: 'compressor_button'
+                        on_press: root.seleciona_compressor('scroll')
+
+                BoxLayout:
+                    orientation: 'horizontal'
+                    spacing: 10
+
+                    Label:
+                        text: 'On'
+                        color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                    CheckBox:
+                        id: compressor_on
+                        group: 'compressor'
+                        on_active: root.checkbox_activated('compressor', self.active)
+
+                    Label:
+                        text: 'Off'
+                        color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+
+                    CheckBox:
+                        id: compressor_off
+                        group: 'compressor'
+
+<HistGraphPopup>:
+    title: 'Histórico das variáveis'
+    BoxLayout:
+        orientation: 'vertical'
+        TimeSeriesGraph:
+            id: graph
+            xlabel: 'Horário'
+            ylabel: 'Variável'
+            background_color: 0.2,0.5,0.5,0.5
+            x_ticks_minor: 1
+            x_ticks_major: 5
+            y_ticks_major: 100
+            y_grid_label: True
+            x_grid_label: True
+            padding: 5
+            x_grid: True
+            y_grid: True
+            xmin: 0
+            ymin: 0
+        BoxLayout:
+            orientation:'horizontal'
+            id: sensores
+            size_hint: (1,0.1)
+        BoxLayout:
+            orientation:'horizontal'
+            size_hint: (1,0.1)
+            Label:
+                text: 'Timestamp Incial \r\n [size=12] (DD/MM/AAAA HH:MM:SS) [/size]'
+                halign: 'center'
+                markup: True
+            TextInput:
+                id: txt_init_time
+                size_hint: (1,0.8)
+                halign: 'center'
+                valign: 'middle'
+                multiline: False
+            Label:
+                text: 'Timestamp Final \r\n [size=12] (DD/MM/AAAA HH:MM:SS) [/size]'
+                halign: 'center'
+                markup: True
+            TextInput:
+                id: txt_final_time
+                size_hint: (1,0.8)
+                halign: 'center'
+                valign: 'middle'
+                multiline: False
+            Button:
+                text:'Fechar'
+                size_hint: (0.8,0.8)
+                on_release: root.dismiss()
+
+<LabeledCheckBoxHistGraph>:
+    orientation: 'horizontal'
+    size_hint: (0.05, 1)
+    CheckBox:
+        id: checkbox
+        on_active: app.root.getDataDB()
+    Label:
+        id:label
+        font_size: 16
+        bold: True
+<TemperaturaPopup>:
+    title: "Temperaturas - Ventilação"
+    size_hint_y: None
+    size_hint_x: 0.4
+    height: 600
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+        GridLayout:
+            cols: 2
+            rows: 6
+            Label:
+                id: medida_titulo_a
+                text: 'Enrolamento FASE R'
+            Label:
+                id: medida_valor_a
+                text: ''
+            Label:
+                id: medida_titulo_b
+                text: 'Enrolamento FASE S'
+            Label:
+                id: medida_valor_b
+                text: ''
+            Label:
+                id: medida_titulo_c
+                text: 'Enrolamento FASE T'
+            Label:
+                id: medida_valor_c
+                text: ''
+            Label:
+                id: medida_titulo_d
+                text: 'CARCAÇA'
+            Label:
+                id: medida_valor_d
+                text: ''
+

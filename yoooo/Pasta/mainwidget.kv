@@ -1,0 +1,325 @@
+#:kivy 1.11.1
+<MainWidget>:
+    orientation: 'vertical'
+    canvas:
+        Color: 
+            rgb: 0.717647058,0.77254901,0.8117647058
+        Rectangle:
+            size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: (1,0.1)
+        padding: [0,10,0,0]
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.3,1
+            Label:
+                text: 'SUPERVISÓRIO'
+                font_size: 30
+                
+            Label:
+                text: 'VENTILAÇÃO v2.0'
+                font_size: 30
+        Button:
+            text: 'MODBUS'
+            on_press: root._modbusPopup.open()
+            size_hint: 0.2,0.6
+            pos_hint: {'x':0, 'y':0.25}
+            padding: [10,0,10,0]
+        Button:
+            text: 'SCANTIME'
+            on_press: root._scanPopup.open()
+            size_hint: 0.2,0.6
+            pos_hint: {'x':0, 'y':0.25}
+            padding: [10,0,10,0]
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 0.2, 1
+            Label:
+                text: 'Conexão com Servidor'
+                color: 0.9, 0.9, 0.9, 1  # Cor branca para o texto
+                font_size: '20sp'
+                padding: [0,15,0,0]
+                height: 40
+            Label:
+                id: servidor_status
+                text: 'Status: Desconectado'
+                color: 1, 0, 0, 1  # Cor vermelha para o texto de desconectado
+                size_hint_y: None
+                height: 40
+        FloatLayout:
+            size_hint: 0.1,1
+            background_color: 'white'
+            Image:
+                id: img_con
+                source: '../imagens/disconected.png'
+                size_hint_x: None
+                pos_hint: {'top':1, 'right':1}
+    FloatLayout:
+        size_hint: (1,0.9)
+        canvas:
+            Color:
+                rgb: 1, 1, 1
+        Image:
+            source: '../imagens/trab.png'
+            size: self.size
+        Button:
+            text: 'Grandezas Elétricas'
+            on_press: root._medidaseletricas.open()
+            pos_hint: {'x': 0.87, 'y': 0.22}
+            size_hint: 0.1,0.1
+        Button:
+            text: 'Controle de Temperatura'
+            on_release: root._scanComp.open()
+            pos_hint: {'x': 0.75, 'y': 0.22}
+            size_hint: 0.1,0.1
+        Button:
+            text: 'Temperaturas'
+            on_press: root._medidastemperatura.open()
+            pos_hint: {'x': 0.87, 'y': 0.10}
+            size_hint: 0.1,0.1
+        Button:
+            text: 'Dados Históricos'
+            on_press: root._hgraph.open()
+            pos_hint: {'x': 0.75, 'y': 0.10}
+            size_hint: 0.1,0.1
+        Label:
+            text: 'TIT1:'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.2, 'y': 0.575}
+
+        Label:
+            id: tit_1
+            text: 'Status'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.2, 'y': 0.55}
+
+        Label:
+            text: 'PIT1:'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.15, 'y': 0.575}
+        Label:
+            id: pit_1
+            text: 'Status'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.15, 'y': 0.55}
+        Label:
+            text:'TIT2:'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.123, 'y': 0.01}
+        Label:
+            id: tit_2
+            text: 'Status'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.123, 'y': 0.04}
+        Label:
+            text: 'PIT2:'
+            color: (0, 0, 0, 1)  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.08, 'y': 0.01}
+        Label:
+            id: pit_2
+            text: 'Status'
+            color: 0, 0, 0, 1  # Cor branca para o texto
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': -0.08, 'y': 0.04}
+        Label:
+            id: st_aquecedor_1
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (0, 0, 0, 1)
+            pos_hint: {'x': -0.15, 'y': 0.63}
+        Label:
+            id: st_aquecedor_2
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (0, 0, 0, 1)
+            pos_hint: {'x': 0.09, 'y': 0.63}
+        FloatLayout:
+            size_hint: 0.3,1
+            background_color: 'white'
+            Image:
+                id: img_aquecedor_1
+                source: '../imagens/vazio.png'
+                size_hint_x: None
+                pos_hint: {'top':1.3, 'right':1.25}
+        FloatLayout:
+            size_hint: 0.3,1
+            background_color: 'white'
+            Image:
+                id: img_aquecedor_2
+                source: '../imagens/vazio.png'
+                size_hint_x: None
+                pos_hint: {'top':1.3, 'right':2.05}
+        Label:
+            id: selecionado_compressor_scroll
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (1, 1, 1, 1)
+            pos_hint: {'x': -0.37, 'y': 0.36}
+        Label:
+            id: selecionado_compressor_hermetico
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (1, 1, 1, 1)
+            pos_hint: {'x': -0.17, 'y': 0.36}
+        Label:
+            id: st_compressor_scroll
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (0, 0, 0, 1)
+            pos_hint: {'x': -0.37, 'y': 0.19}
+        Label:
+            id: st_compressor_hermetico
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (0, 0, 0, 1)
+            pos_hint: {'x': -0.17, 'y': 0.16}
+        Label:
+            id: temp_saida
+            text: 'Status'
+            color: 0, 0, 0, 1
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': 0.275, 'y': 0.78}
+        Label:
+            id: vel_saida
+            text: 'Status'
+            color: 0, 0, 0, 1
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': 0.375, 'y': 0.78}
+        Label:
+            id: vazao_saida
+            text: 'Status'
+            color: 0, 0, 0, 1
+            size_hint_y: None
+            height: 40
+            pos_hint: {'x': 0.325, 'y': 0.73}
+        Label:
+            id: vel_scroll
+            text: ''
+            size_hint_y: None
+            height: 40
+            color: (0, 0, 0, 1)
+            pos_hint: {'x': -0.37, 'y': 0.13}
+        Label:
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'MOTOR'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.41, 'y': 0.82}
+        Label:
+            id: tipo_motor
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: ''
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.41, 'y': 0.78}
+        Label:
+            id: st_motor
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: ''
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.41, 'y': 0.55}
+        Label:
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'VENTILADOR'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.025, 'y': 0.26}
+        Label:
+            id: tipo_vent
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'AXIAL'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.025, 'y': 0.23}
+        Label:
+            id: st_vent
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: ''
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.025, 'y': 0.2}
+        FloatLayout:
+            size_hint: 0.3,1
+            background_color: 'white'
+            Image:
+                id: img_ventilador
+                source: '../imagens/radial_desligado.png'
+                size_hint: (0.5, 0.5)
+                pos_hint: {'top':1.02, 'right':0.6}
+        Label:
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'TIPO DE PARTIDA:'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': 0.31, 'y': 0.42}
+        ToggleButton:
+            size_hint: 0.2, 0.8
+            text: 'SOFT STARTER'
+            group: 'motor'
+            on_press: root._softPopup.open(), root.mudaPartida("soft")
+            pos_hint: {'x': 0.67, 'y': 0.42}
+            size_hint: 0.1,0.1
+        ToggleButton:
+            size_hint: 0.2, 0.8
+            text: 'INVERSOR DE FREQUÊNCIA'
+            group: 'motor'
+            on_press: root._inversorPopup.open(), root.mudaPartida("inversor")
+            pos_hint: {'x': 0.771, 'y': 0.42}
+            size_hint: 0.1,0.1
+        ToggleButton:
+            size_hint: 0.2, 0.8
+            text: 'DIRETA'
+            group: 'motor'
+            on_press: root._diretaPopup.open(), root.mudaPartida("direta")
+            pos_hint: {'x': 0.872, 'y': 0.42}
+            size_hint: 0.1,0.1
+        Label:
+            id: encoder
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'status RPM'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.4, 'y': 0.475}
+            color: (0, 0, 0, 1)
+        Label:
+            id: torque
+            halign: 'center'
+            size_hint: 1, 0.3
+            text: 'status N*m'
+            padding: [0, 35, 0, 0] 
+            font_size: '20sp'
+            pos_hint: {'x': -0.3, 'y': 0.475}
+            color: (0, 0, 0, 1)
